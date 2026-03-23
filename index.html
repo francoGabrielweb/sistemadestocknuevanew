@@ -1,1114 +1,276 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-  <meta name="theme-color" content="#ffffff"/>
-  <meta name="robots" content="noindex, nofollow"/>
-  <title>StockControl</title>
-  <link rel="stylesheet" href="styles.css"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#ffffff"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>StockControl</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 
-<!-- ════ APP ════ -->
-<div id="app" class="app">
-  <div class="main">
+<div id="app">
 
-    <!-- ══ ESCANEAR ══════════════════════════════════════════════════ -->
-    <section id="sec-scan" class="section active">
-      <div class="section-header">
-        <div class="header-title"><h2>Escanear</h2><p class="section-sub">Consultá stock al instante</p></div>
-      </div>
-      <div class="page-body">
-        <div class="scanner-card">
-          <div class="scanner-viewport" id="scanner-vp">
-            <video id="scanner-video" playsinline muted autoplay></video>
-            <div class="scanner-overlay">
-              <div class="scan-frame">
-                <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
-                <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
-                <div class="scan-line"></div>
-              </div>
-            </div>
-            <div id="scanner-status" class="scanner-status">Presioná iniciar</div>
-          </div>
-          <div class="scanner-btns">
-            <button class="btn-primary" id="btn-cam-start">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Iniciar cámara
-            </button>
-            <button class="btn-outline hidden" id="btn-cam-stop">Detener</button>
-          </div>
-          <div class="manual-row-wrap">
-            <div class="manual-label">O ingresá el código</div>
-            <div class="manual-row">
-              <input type="text" id="inp-barcode" placeholder="7790040016025" inputmode="numeric"/>
-              <button class="btn-primary sm" id="btn-manual">OK</button>
-            </div>
-          </div>
+  <!-- ══ ESCANEAR ══════════════════════════════════════════════ -->
+  <section id="pg-scan" class="page active">
+    <div class="topbar"><h1>Escanear</h1></div>
+    <div class="scroll">
+      <div class="scan-card">
+        <div class="viewport" id="scan-vp">
+          <video id="scan-video" playsinline muted autoplay></video>
+          <div class="scan-overlay"><div class="scan-frame">
+            <span class="c tl"></span><span class="c tr"></span>
+            <span class="c bl"></span><span class="c br"></span>
+            <div class="scan-line"></div>
+          </div></div>
+          <div class="scan-status" id="scan-status">Presioná iniciar</div>
         </div>
-
-        <!-- Resultado scan -->
-        <div id="scan-result-area" class="hidden">
-          <!-- Existente -->
-          <div id="result-existing" class="hidden">
-            <div class="result-card">
-              <div class="result-head">
-                <div class="result-icon" id="ri-icon"></div>
-                <div class="result-info">
-                  <div class="result-name" id="ri-name"></div>
-                  <div class="result-variant" id="ri-variant"></div>
-                  <div class="result-code" id="ri-code"></div>
-                </div>
-                <div id="ri-cat" class="badge badge-info"></div>
-              </div>
-              <div id="ri-img-wrap" class="product-img-wrap hidden">
-                <img id="ri-img" class="product-img" alt=""/>
-              </div>
-              <div class="stock-hero">
-                <div class="stock-hero-main">
-                  <span class="stock-hero-num" id="ri-stock-num">0</span>
-                  <span class="stock-hero-unit">unidades en stock</span>
-                </div>
-                <div class="stock-hero-sub" id="ri-stock-pkg"></div>
-              </div>
-              <div class="lots-section">
-                <div class="lots-section-title">Lotes en stock</div>
-                <div id="ri-lots"></div>
-              </div>
-            </div>
-            <button class="btn-close-scan" id="btn-close-scan">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Cerrar y escanear otro
-            </button>
-          </div>
-          <!-- No registrado -->
-          <div id="result-unknown" class="hidden">
-            <div class="result-card">
-              <div class="result-head">
-                <div class="result-icon" style="background:var(--amber-bg);color:var(--amber-text)">?</div>
-                <div class="result-info">
-                  <div class="result-name">Producto no registrado</div>
-                  <div class="result-code" id="unknown-code"></div>
-                </div>
-                <span class="badge badge-warn">Nuevo</span>
-              </div>
-              <div style="padding:1rem;font-size:13px;color:var(--text2)">
-                No está en el sistema. Andá a <strong>Registrar</strong> para darlo de alta.
-              </div>
-            </div>
-            <button class="btn-close-scan" id="btn-close-unknown">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Cerrar y escanear otro
-            </button>
-          </div>
+        <div class="scan-btns">
+          <button class="btn-p" id="btn-scan-start">▶ Iniciar cámara</button>
+          <button class="btn-o hidden" id="btn-scan-stop">Detener</button>
         </div>
-      </div>
-    </section>
-
-    <!-- ══ DEPÓSITO ══════════════════════════════════════════════════ -->
-    <section id="sec-deposit" class="section">
-      <div class="section-header">
-        <div class="header-title"><h2>Depósito</h2></div>
-        <div class="header-actions">
-          <button class="btn-icon" id="btn-dep-scan-toggle" title="Escanear código">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M16 16h5M16 19h5M16 22h5"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Scanner colapsable -->
-      <div id="dep-scanner-wrap" class="hidden">
-        <div style="padding:.875rem .875rem 0">
-          <div class="scanner-card" style="margin:0">
-            <div class="scanner-viewport" id="dep-scanner-vp">
-              <video id="dep-scanner-video" playsinline muted autoplay></video>
-              <div class="scanner-overlay">
-                <div class="scan-frame">
-                  <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
-                  <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
-                  <div class="scan-line"></div>
-                </div>
-              </div>
-              <div id="dep-scanner-status" class="scanner-status">Presioná iniciar</div>
-            </div>
-            <div class="scanner-btns">
-              <button class="btn-primary" id="btn-dep-cam-start">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Iniciar cámara
-              </button>
-              <button class="btn-outline hidden" id="btn-dep-cam-stop">Detener</button>
-            </div>
-            <div class="manual-row-wrap">
-              <div class="manual-label">O ingresá el código</div>
-              <div class="manual-row">
-                <input type="text" id="dep-inp-barcode" placeholder="Código de barras" inputmode="numeric"/>
-                <button class="btn-primary sm" id="btn-dep-manual">OK</button>
-              </div>
-            </div>
+        <div class="manual-wrap">
+          <div class="manual-label">O ingresá el código</div>
+          <div class="manual-row">
+            <input type="text" id="scan-inp" placeholder="Código de barras" inputmode="numeric"/>
+            <button class="btn-p sm" id="btn-scan-manual">OK</button>
           </div>
         </div>
       </div>
 
-      <!-- Búsqueda -->
-      <div class="search-wrap">
-        <input type="text" id="dep-search" placeholder="Buscar producto…" style="flex:1"/>
-        <select id="dep-cat-filter">
-          <option value="">Todas</option>
-          <option>Bebidas</option><option>Lácteos</option><option>Carnes</option>
-          <option>Frutas y verduras</option><option>Panadería</option><option>Enlatados</option>
-          <option>Otros</option><option>Higiene personal</option><option>Limpieza</option><option>Congelados</option>
-        </select>
-      </div>
-
-      <!-- Filtros — grupo stock -->
-      <div class="filter-group-wrap">
-        <div class="filter-group-label">Stock</div>
-        <div class="chips-wrap" id="dep-chips-stock" style="position:static;border:none;padding:.375rem 0">
-          <button class="chip active" data-filter="all">Todos</button>
-          <button class="chip" data-filter="zero">Sin stock</button>
-          <button class="chip" data-filter="low">Stock bajo</button>
-          <button class="chip" data-filter="ok">Con stock</button>
-        </div>
-      </div>
-      <!-- Filtros — grupo fechas -->
-      <div class="filter-group-wrap" style="border-bottom:1px solid var(--border)">
-        <div class="filter-group-label">Vencimiento</div>
-        <div class="chips-wrap" id="dep-chips-exp" style="position:static;border:none;padding:.375rem 0">
-          <button class="chip chip-exp active" data-exp="any">Todos</button>
-          <button class="chip chip-exp" data-exp="0">Vencidos</button>
-          <button class="chip chip-exp" data-exp="3">3 días</button>
-          <button class="chip chip-exp" data-exp="7">7 días</button>
-          <button class="chip chip-exp" data-exp="15">15 días</button>
-          <button class="chip chip-exp" data-exp="30">30 días</button>
-          <button class="chip chip-exp" data-exp="60">60 días</button>
-          <button class="chip chip-exp" data-exp="90">3 meses</button>
-          <button class="chip chip-exp" data-exp="180">6 meses</button>
-          <button class="chip chip-exp" data-exp="nofecha">Sin fecha</button>
-        </div>
-      </div>
-
-      <div class="page-body" style="padding-top:.875rem">
-        <div class="metrics-row" id="dep-metrics"></div>
-        <div class="card">
-          <div id="dep-product-list"></div>
-          <div id="dep-empty" class="empty-state hidden">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <p id="dep-empty-msg">No hay productos.<br>Usá <strong>Registrar</strong> para dar de alta el primero.</p>
+      <!-- resultado -->
+      <div id="scan-result" class="hidden">
+        <!-- producto encontrado -->
+        <div id="scan-found" class="hidden">
+          <div class="result-card">
+            <div class="result-head">
+              <div class="avatar" id="sr-avatar"></div>
+              <div class="result-info">
+                <div class="result-name" id="sr-name"></div>
+                <div class="result-variant" id="sr-variant"></div>
+                <div class="result-code" id="sr-code"></div>
+              </div>
+              <span class="badge" id="sr-cat"></span>
+            </div>
+            <div id="sr-img-wrap" class="prod-img-wrap hidden">
+              <img id="sr-img" class="prod-img" alt=""/>
+            </div>
+            <div class="stock-hero">
+              <span class="stock-num" id="sr-stock">0</span>
+              <span class="stock-unit">unidades en stock</span>
+            </div>
+            <div class="stock-sub" id="sr-pkg"></div>
+            <div class="lots-title">Lotes en stock</div>
+            <div id="sr-lots"></div>
           </div>
+          <button class="btn-o full mt" id="btn-scan-close">✕ Cerrar y escanear otro</button>
+        </div>
+        <!-- producto no encontrado -->
+        <div id="scan-unknown" class="hidden">
+          <div class="result-card">
+            <div class="result-head">
+              <div class="avatar warn">?</div>
+              <div class="result-info">
+                <div class="result-name">No registrado</div>
+                <div class="result-code" id="sr-unknown-code"></div>
+              </div>
+              <span class="badge warn">Nuevo</span>
+            </div>
+            <p class="hint">Andá a <strong>Registrar</strong> para darlo de alta.</p>
+          </div>
+          <button class="btn-o full mt" id="btn-unknown-close">✕ Cerrar y escanear otro</button>
         </div>
       </div>
-    </section>
-
-    <!-- ══ REGISTRAR ═════════════════════════════════════════════════ -->
-    <section id="sec-register" class="section">
-      <div class="section-header">
-        <div class="header-title"><h2>Registrar producto</h2><p class="section-sub">Dar de alta un producto nuevo</p></div>
-      </div>
-      <div class="page-body">
-
-        <!-- Buscar por código -->
-        <div class="card" style="margin-bottom:.875rem">
-          <div class="card-body">
-            <p class="section-mini-title" style="margin-bottom:.75rem">Código de barras</p>
-            <div class="manual-row">
-              <input type="text" id="reg-barcode" placeholder="Escaneá o ingresá el código" inputmode="numeric"/>
-              <button class="btn-primary sm" id="btn-reg-scan-code">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/></svg>
-              </button>
-            </div>
-            <!-- Mini scanner para registrar -->
-            <div id="reg-scanner-wrap" class="hidden" style="margin-top:.75rem">
-              <div class="scanner-viewport" id="reg-scanner-vp" style="max-height:200px;border-radius:var(--r-sm)">
-                <video id="reg-scanner-video" playsinline muted autoplay></video>
-                <div class="scanner-overlay">
-                  <div class="scan-frame">
-                    <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
-                    <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
-                    <div class="scan-line"></div>
-                  </div>
-                </div>
-                <div id="reg-scanner-status" class="scanner-status">Apuntá al código</div>
-              </div>
-              <button class="btn-outline" id="btn-reg-cam-stop" style="margin-top:8px">Cerrar cámara</button>
-            </div>
-            <div id="reg-barcode-exists" class="hidden" style="margin-top:.75rem;padding:.75rem;background:var(--amber-bg);border-radius:var(--r-sm);font-size:13px;color:var(--amber-text)">
-              ⚠️ Este código ya está registrado. Usá <strong>Depósito</strong> para agregar stock.
-            </div>
-          </div>
-        </div>
-
-        <!-- Formulario de registro -->
-        <div id="reg-form" class="card">
-          <div class="card-body">
-            <div class="form-group">
-              <label>Nombre *</label>
-              <input type="text" id="reg-name" placeholder="Ej: Arroz Gallo de Oro"/>
-            </div>
-            <div class="form-group">
-              <label>Variante / sabor / tamaño</label>
-              <input type="text" id="reg-variant" placeholder="Ej: 1kg, Sin TACC, Light…"/>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Categoría</label>
-                <select id="reg-cat">
-                  <option>Bebidas</option><option>Lácteos</option><option>Carnes</option>
-                  <option>Frutas y verduras</option><option>Panadería</option>
-                  <option>Enlatados</option><option selected>Otros</option>
-                  <option>Higiene personal</option><option>Limpieza</option><option>Congelados</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Tipo de paquete</label>
-                <select id="reg-pkg-type">
-                  <option value="unidad">Unidad</option>
-                  <option value="pack">Pack</option>
-                  <option value="bulto">Bulto</option>
-                  <option value="cajón">Cajón</option>
-                  <option value="caja">Caja</option>
-                  <option value="fardo">Fardo</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Unidades por paquete</label>
-              <input type="number" id="reg-pkg-qty" value="1" min="1" inputmode="numeric" placeholder="Ej: 12 si 1 bulto tiene 12 unidades"/>
-            </div>
-
-            <!-- Foto -->
-            <div class="form-group">
-              <label>Foto del producto (opcional)</label>
-              <div class="img-capture-area">
-                <img id="reg-img-preview" class="img-preview hidden" alt=""/>
-                <div id="reg-img-placeholder" class="img-placeholder">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  <span>Sin foto</span>
-                </div>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn-outline sm" id="btn-reg-photo" style="flex:1">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  Sacar foto
-                </button>
-                <button class="btn-outline sm" id="btn-reg-clear-photo" disabled style="flex:1">Quitar foto</button>
-              </div>
-              <input type="file" id="reg-inp-photo" accept="image/*" capture="environment" class="hidden"/>
-            </div>
-
-            <div class="divider"></div>
-            <p class="section-mini-title" style="margin-bottom:.75rem">Primer ingreso al depósito</p>
-
-            <!-- Calculadora de paquetes -->
-            <div class="pkg-calc-card">
-              <div class="form-row" style="margin-bottom:.5rem">
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Cantidad que ingresa</label>
-                  <input type="number" id="reg-qty" min="1" value="1" inputmode="numeric"/>
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Tipo</label>
-                  <select id="reg-qty-type">
-                    <option value="pkg">Paquetes (bultos/packs…)</option>
-                    <option value="unit">Unidades sueltas</option>
-                  </select>
-                </div>
-              </div>
-              <div id="reg-qty-calc" class="qty-calc-preview"></div>
-            </div>
-
-            <div class="form-row" style="margin-top:.75rem">
-              <div class="form-group">
-                <label>Fecha de vencimiento</label>
-                <input type="date" id="reg-exp"/>
-              </div>
-              <div class="form-group">
-                <label>Precio costo ($)</label>
-                <input type="number" id="reg-price" step="0.01" placeholder="0.00" inputmode="decimal"/>
-              </div>
-            </div>
-
-            <button class="btn-primary" id="btn-reg-save" style="margin-top:.25rem">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Registrar producto
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══ FECHAS ════════════════════════════════════════════════════ -->
-    <section id="sec-expiry" class="section">
-      <div class="section-header">
-        <div class="header-title"><h2>Fechas</h2></div>
-      </div>
-      <div class="chips-wrap" id="exp-chips">
-        <button class="chip active" data-days="0">Vencidos</button>
-        <button class="chip" data-days="7">7 días</button>
-        <button class="chip" data-days="15">15 días</button>
-        <button class="chip" data-days="30">30 días</button>
-        <button class="chip" data-days="60">60 días</button>
-        <button class="chip" data-days="9999">Todos</button>
-      </div>
-      <div class="page-body">
-        <div class="metrics-row" id="exp-metrics"></div>
-        <div class="card">
-          <div id="exp-list"></div>
-          <div id="exp-empty" class="empty-state hidden">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <p>Sin lotes en este rango</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══ MÁS ══════════════════════════════════════════════════════ -->
-    <section id="sec-config" class="section">
-      <div class="section-header">
-        <div class="header-title"><h2>Más</h2></div>
-      </div>
-      <div class="page-body">
-        <div class="card" style="margin-bottom:.875rem">
-          <div class="card-header"><span class="card-title">Registrar producto nuevo</span></div>
-          <div class="card-body">
-            <p style="font-size:13px;color:var(--text2);margin-bottom:.875rem">Dar de alta un producto que aún no está en el sistema.</p>
-            <button class="btn-outline sm" id="btn-cfg-go-register">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Ir a Registrar
-            </button>
-          </div>
-        </div>
-          <div class="card-body">
-            <p style="font-size:13px;color:var(--text2);margin-bottom:.875rem">Exportá todos tus datos y restauralos en cualquier dispositivo.</p>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn-primary sm" id="btn-backup-export">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Exportar backup
-              </button>
-              <button class="btn-outline sm" id="btn-backup-import">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Restaurar backup
-              </button>
-            </div>
-            <input type="file" id="inp-backup-file" accept=".json" class="hidden"/>
-          </div>
-        </div>
-        <div class="card" style="margin-bottom:.875rem">
-          <div class="card-header"><span class="card-title">Exportar CSV</span></div>
-          <div class="card-body">
-            <p style="font-size:13px;color:var(--text2);margin-bottom:.875rem">Inventario completo para abrir en Excel.</p>
-            <button class="btn-outline sm" id="btn-full-csv">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exportar inventario
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══ RECEPCIÓN ════════════════════════════════════════════════ -->
-    <section id="sec-reception" class="section">
-      <div class="section-header">
-        <div class="header-title"><h2>Recepción</h2><p class="section-sub">Control de ingreso por proveedor</p></div>
-        <div class="header-actions">
-          <button class="btn-icon" id="btn-rec-history" title="Ver recepciones anteriores">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l3 9-8 5 8-5 3-9h6"/><path d="M12 12v9"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- ── Estado: sin sesión activa ─────────────────────────── -->
-      <div id="rec-idle" class="page-body">
-        <div class="card" style="margin-bottom:.875rem">
-          <div class="card-body" style="text-align:center;padding:2rem 1rem">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3" style="margin-bottom:.875rem"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M13 16l2 2 4-4"/></svg>
-            <p style="font-size:15px;font-weight:600;margin-bottom:.5rem">Sin sesión activa</p>
-            <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem">Iniciá una nueva recepción para controlar la mercadería que llega hoy.</p>
-            <button class="btn-primary" id="btn-rec-new" style="max-width:280px;margin:0 auto">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Nueva recepción
-            </button>
-          </div>
-        </div>
-        <!-- Últimas recepciones -->
-        <div class="card">
-          <div class="card-header"><span class="card-title">Recepciones recientes</span></div>
-          <div id="rec-recent-list">
-            <div class="empty-state" style="padding:1.5rem"><p>Sin recepciones aún</p></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Formulario nueva recepción ────────────────────────── -->
-      <div id="rec-new-form" class="page-body hidden">
-        <div class="card">
-          <div class="card-body">
-            <p class="section-mini-title" style="margin-bottom:.875rem">Nueva sesión de recepción</p>
-            <div class="form-group">
-              <label>Proveedor *</label>
-              <input type="text" id="rec-supplier" placeholder="Ej: Coca Cola, Arcor, La Serenísima…" list="rec-supplier-list"/>
-              <datalist id="rec-supplier-list"></datalist>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Fecha</label>
-                <input type="date" id="rec-date"/>
-              </div>
-              <div class="form-group">
-                <label>Notas</label>
-                <input type="text" id="rec-notes" placeholder="Ej: pedido semanal…"/>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:.25rem">
-              <button class="btn-primary" id="btn-rec-start" style="flex:1">Iniciar recepción</button>
-              <button class="btn-outline" id="btn-rec-cancel-new" style="width:auto;padding:14px 18px">Cancelar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Sesión activa ─────────────────────────────────────── -->
-      <div id="rec-active" class="hidden">
-
-        <!-- Header sesión -->
-        <div class="rec-session-header">
-          <div class="rec-session-info">
-            <div class="rec-supplier-name" id="rec-active-supplier"></div>
-            <div class="rec-session-meta" id="rec-active-meta"></div>
-          </div>
-          <button class="btn-outline sm danger-outline" id="btn-rec-close-session">Cerrar sesión</button>
-        </div>
-
-        <!-- Scanner -->
-        <div style="padding:.875rem .875rem 0">
-          <div class="scanner-card" style="margin:0">
-            <div class="scanner-viewport" id="rec-scanner-vp">
-              <video id="rec-scanner-video" playsinline muted autoplay></video>
-              <div class="scanner-overlay">
-                <div class="scan-frame">
-                  <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
-                  <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
-                  <div class="scan-line"></div>
-                </div>
-              </div>
-              <div id="rec-scanner-status" class="scanner-status">Presioná iniciar</div>
-            </div>
-            <div class="scanner-btns">
-              <button class="btn-primary" id="btn-rec-cam-start">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Iniciar cámara
-              </button>
-              <button class="btn-outline hidden" id="btn-rec-cam-stop">Detener</button>
-            </div>
-            <div class="manual-row-wrap">
-              <div class="manual-label">O ingresá el código</div>
-              <div class="manual-row">
-                <input type="text" id="rec-inp-barcode" placeholder="Código de barras" inputmode="numeric"/>
-                <button class="btn-primary sm" id="btn-rec-manual">OK</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Panel producto escaneado -->
-        <div id="rec-product-panel" class="hidden" style="padding:.875rem .875rem 0">
-          <div class="rec-product-card">
-            <div class="rec-product-head">
-              <div class="result-icon" id="rec-p-icon"></div>
-              <div style="flex:1;min-width:0">
-                <div class="result-name" id="rec-p-name"></div>
-                <div class="result-variant" id="rec-p-variant"></div>
-                <div class="result-code" id="rec-p-code"></div>
-              </div>
-              <button class="dep-close-btn" id="btn-rec-p-close">✕</button>
-            </div>
-            <div class="card-body" style="padding:.875rem">
-              <div class="pkg-calc-card" style="margin-bottom:.75rem">
-                <div class="form-row" style="margin-bottom:.5rem">
-                  <div class="form-group" style="margin-bottom:0">
-                    <label>Cantidad recibida</label>
-                    <input type="number" id="rec-p-qty" min="1" value="1" inputmode="numeric"/>
-                  </div>
-                  <div class="form-group" style="margin-bottom:0">
-                    <label>Tipo</label>
-                    <select id="rec-p-qty-type">
-                      <option value="pkg">Paquetes</option>
-                      <option value="unit">Unidades sueltas</option>
-                    </select>
-                  </div>
-                </div>
-                <div id="rec-p-calc" class="qty-calc-preview"></div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Fecha vencimiento</label>
-                  <input type="date" id="rec-p-exp"/>
-                </div>
-                <div class="form-group">
-                  <label>Precio unitario ($)</label>
-                  <input type="number" id="rec-p-price" step="0.01" placeholder="0.00" inputmode="decimal"/>
-                </div>
-              </div>
-              <button class="btn-primary" id="btn-rec-p-add">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Agregar a la lista
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lista de ítems de la sesión -->
-        <div style="padding:.875rem">
-          <div class="rec-list-header">
-            <span class="section-mini-title">Lista de la sesión</span>
-            <span class="badge badge-info" id="rec-items-count">0 ítems</span>
-          </div>
-          <div class="card" style="margin-top:.5rem">
-            <div id="rec-items-list">
-              <div class="empty-state" style="padding:1.5rem">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                <p>Escaneá un producto para agregarlo</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Resumen total -->
-          <div id="rec-summary" class="rec-summary hidden">
-            <div class="rec-summary-row">
-              <span>Total ítems</span>
-              <span id="rec-total-items">0</span>
-            </div>
-            <div class="rec-summary-row">
-              <span>Total unidades</span>
-              <span id="rec-total-units">0</span>
-            </div>
-            <div class="rec-summary-row" id="rec-total-price-row">
-              <span>Total costo</span>
-              <span id="rec-total-price">$0</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Vista de recepción cerrada (solo lectura) ──────────── -->
-      <div id="rec-closed-view" class="hidden">
-        <div class="rec-session-header">
-          <div class="rec-session-info">
-            <div class="rec-supplier-name" id="rec-closed-supplier"></div>
-            <div class="rec-session-meta" id="rec-closed-meta"></div>
-          </div>
-          <button class="btn-outline sm" id="btn-rec-closed-back">← Volver</button>
-        </div>
-        <div style="padding:.875rem">
-          <div class="card">
-            <div id="rec-closed-items-list"></div>
-          </div>
-          <div id="rec-closed-summary" class="rec-summary" style="margin-top:.875rem"></div>
-        </div>
-      </div>
-
-    </section>
-
-
-    <section id="sec-gondola" class="section">
-        <div class="section-header">
-          <div class="header-title"><h2>Góndola</h2><p class="section-sub">¿Qué traer del depósito?</p></div>
-          <div class="header-actions">
-            <button class="btn-icon" id="btn-gondola-share" title="Compartir lista" style="display:none">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            </button>
-            <button class="btn-icon" id="btn-gondola-clear" title="Vaciar lista" style="display:none">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-            </button>
-          </div>
-        </div>
-    
-        <!-- Búsqueda principal -->
-        <div class="gondola-search-wrap">
-          <div class="gondola-search-row">
-            <div style="position:relative;flex:1">
-              <input type="text" id="gondola-search" placeholder="Buscar por nombre — arroz, tomate, lavandina…" style="padding-left:2.5rem"/>
-              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </div>
-            <button class="btn-icon" id="btn-gondola-scan" title="Escanear código">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M16 16h5M16 19h5M16 22h5"/></svg>
-            </button>
-          </div>
-          <!-- Mini scanner -->
-          <div id="gondola-scanner-wrap" class="hidden" style="padding-top:.75rem">
-            <div class="scanner-viewport" id="gondola-scanner-vp" style="max-height:180px;border-radius:var(--r-sm)">
-              <video id="gondola-scanner-video" playsinline muted autoplay></video>
-              <div class="scanner-overlay"><div class="scan-frame">
-                <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
-                <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
-                <div class="scan-line"></div>
-              </div></div>
-              <div id="gondola-scanner-status" class="scanner-status">Apuntá al código</div>
-            </div>
-            <button class="btn-outline" id="btn-gondola-cam-stop" style="margin-top:8px;width:100%">Cerrar cámara</button>
-          </div>
-        </div>
-    
-        <!-- Filtros rápidos por categoría -->
-        <div class="chips-wrap" id="gondola-cat-chips" style="top:106px">
-          <button class="chip active" data-cat="">Todo</button>
-          <button class="chip" data-cat="Bebidas">Bebidas</button>
-          <button class="chip" data-cat="Lácteos">Lácteos</button>
-          <button class="chip" data-cat="Enlatados">Enlatados</button>
-          <button class="chip" data-cat="Carnes">Carnes</button>
-          <button class="chip" data-cat="Panadería">Panadería</button>
-          <button class="chip" data-cat="Otros">Otros</button>
-          <button class="chip" data-cat="Higiene personal">Higiene</button>
-          <button class="chip" data-cat="Limpieza">Limpieza</button>
-          <button class="chip" data-cat="Congelados">Congelados</button>
-        </div>
-    
-        <div class="page-body" style="padding-top:.875rem">
-    
-          <!-- Estado vacío / bienvenida -->
-          <div id="gondola-welcome" class="card" style="margin-bottom:.875rem">
-            <div class="card-body" style="text-align:center;padding:1.5rem">
-              <p style="font-size:15px;font-weight:600;margin-bottom:.5rem">Buscar para ver stock del depósito</p>
-              <p style="font-size:13px;color:var(--text2)">Escribí el nombre del producto o escaneá el código.<br>Después agregá lo que necesitás a la lista de reposición.</p>
-            </div>
-          </div>
-    
-          <!-- Resultados de búsqueda -->
-          <div id="gondola-results" class="hidden">
-            <div class="card" style="margin-bottom:.875rem">
-              <div class="card-header">
-                <span class="card-title" id="gondola-results-title">Resultados</span>
-                <span class="badge badge-info" id="gondola-results-count"></span>
-              </div>
-              <div id="gondola-results-list"></div>
-            </div>
-          </div>
-    
-          <!-- Lista de reposición -->
-          <div id="gondola-list-section" class="hidden">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-              <span class="section-mini-title">Lista de reposición</span>
-              <span class="badge badge-ok" id="gondola-list-count"></span>
-            </div>
-            <div class="card" style="margin-bottom:.875rem">
-              <div id="gondola-list-items"></div>
-            </div>
-          </div>
-    
-        </div>
-      </section>
-
-    <section id="sec-conteo" class="section">
-        <div class="section-header">
-          <div class="header-title"><h2>Conteo físico</h2><p class="section-sub">Actualizá el stock real del depósito</p></div>
-          <div class="header-actions">
-            <button class="btn-icon" id="btn-conteo-history" title="Conteos anteriores">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
-            </button>
-          </div>
-        </div>
-    
-        <!-- Estado idle -->
-        <div id="cnt-idle" class="page-body">
-          <div class="card" style="margin-bottom:.875rem">
-            <div class="card-body" style="text-align:center;padding:2rem 1rem">
-              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".3" style="margin-bottom:.875rem"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-              <p style="font-size:16px;font-weight:700;margin-bottom:.5rem">Sin conteo activo</p>
-              <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem">Escaneá todo lo que tenés en el depósito. Al terminar el sistema compara con el stock registrado y lo corrige.</p>
-              <button class="btn-primary" id="btn-cnt-new" style="max-width:280px;margin:0 auto">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Iniciar conteo
-              </button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><span class="card-title">Conteos anteriores</span></div>
-            <div id="cnt-history-list"><div class="empty-state" style="padding:1.5rem"><p>Sin conteos aún</p></div></div>
-          </div>
-        </div>
-    
-        <!-- Conteo activo -->
-        <div id="cnt-active" class="hidden">
-          <div class="rec-session-header">
-            <div class="rec-session-info">
-              <div class="rec-supplier-name" id="cnt-active-title">Conteo en curso</div>
-              <div class="rec-session-meta" id="cnt-active-meta"></div>
-            </div>
-            <button class="btn-primary sm" id="btn-cnt-finish">Ver diferencias</button>
-          </div>
-    
-          <!-- Scanner -->
-          <div style="padding:.875rem .875rem 0">
-            <div class="scanner-card" style="margin:0">
-              <div class="scanner-viewport" id="cnt-scanner-vp">
-                <video id="cnt-scanner-video" playsinline muted autoplay></video>
-                <div class="scanner-overlay">
-                  <div class="scan-frame">
-                    <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
-                    <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
-                    <div class="scan-line"></div>
-                  </div>
-                </div>
-                <div id="cnt-scanner-status" class="scanner-status">Presioná iniciar</div>
-              </div>
-              <div class="scanner-btns">
-                <button class="btn-primary" id="btn-cnt-cam-start">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  Iniciar cámara
-                </button>
-                <button class="btn-outline hidden" id="btn-cnt-cam-stop">Detener</button>
-              </div>
-              <div class="manual-row-wrap">
-                <div class="manual-label">O ingresá el código</div>
-                <div class="manual-row">
-                  <input type="text" id="cnt-inp-barcode" placeholder="Código de barras" inputmode="numeric"/>
-                  <button class="btn-primary sm" id="btn-cnt-manual">OK</button>
-                </div>
-              </div>
-            </div>
-          </div>
-    
-          <!-- Panel producto escaneado para conteo -->
-          <div id="cnt-product-panel" class="hidden" style="padding:.875rem .875rem 0">
-            <div class="rec-product-card">
-              <div class="rec-product-head">
-                <div class="result-icon" id="cnt-p-icon"></div>
-                <div style="flex:1;min-width:0">
-                  <div class="result-name" id="cnt-p-name"></div>
-                  <div class="result-variant" id="cnt-p-variant"></div>
-                  <div class="result-code" id="cnt-p-code"></div>
-                </div>
-                <button class="dep-close-btn" id="btn-cnt-p-close">✕</button>
-              </div>
-              <div class="card-body" style="padding:.875rem">
-                <div class="pkg-calc-card" style="margin-bottom:.75rem">
-                  <div class="form-row" style="margin-bottom:.5rem">
-                    <div class="form-group" style="margin-bottom:0">
-                      <label>Cantidad contada</label>
-                      <input type="number" id="cnt-p-qty" min="0" value="0" inputmode="numeric"/>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                      <label>Tipo</label>
-                      <select id="cnt-p-qty-type">
-                        <option value="pkg">Paquetes</option>
-                        <option value="unit">Unidades sueltas</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div id="cnt-p-calc" class="qty-calc-preview"></div>
-                </div>
-                <!-- Stock actual del sistema para comparar -->
-                <div id="cnt-p-current" style="font-size:13px;color:var(--text2);padding:.5rem 0;border-top:1px solid var(--border);margin-top:.25rem"></div>
-                <button class="btn-primary" id="btn-cnt-p-add">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  Agregar al conteo
-                </button>
-              </div>
-            </div>
-          </div>
-    
-          <!-- Lista de lo contado hasta ahora -->
-          <div style="padding:.875rem">
-            <div class="rec-list-header">
-              <span class="section-mini-title">Productos contados</span>
-              <span class="badge badge-info" id="cnt-items-count">0 productos</span>
-            </div>
-            <div class="card" style="margin-top:.5rem">
-              <div id="cnt-items-list">
-                <div class="empty-state" style="padding:1.5rem">
-                  <p>Escaneá el primer producto del depósito</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-    
-        <!-- Vista diferencias antes de confirmar -->
-        <div id="cnt-diff-view" class="hidden">
-          <div class="rec-session-header">
-            <div class="rec-session-info">
-              <div class="rec-supplier-name">Resumen de diferencias</div>
-              <div class="rec-session-meta" id="cnt-diff-meta"></div>
-            </div>
-            <button class="btn-outline sm" id="btn-cnt-diff-back">← Editar</button>
-          </div>
-          <div class="page-body">
-            <!-- Métricas rápidas -->
-            <div class="metrics-row" id="cnt-diff-metrics"></div>
-            <!-- Tabla diferencias -->
-            <div class="card" style="margin-bottom:.875rem">
-              <div class="card-header">
-                <span class="card-title">Diferencias detectadas</span>
-                <span class="badge badge-warn" id="cnt-diff-badge"></span>
-              </div>
-              <div id="cnt-diff-list"></div>
-            </div>
-            <!-- Productos no contados -->
-            <div class="card" id="cnt-missing-card" style="margin-bottom:.875rem">
-              <div class="card-header">
-                <span class="card-title">No contados (se asumirá 0)</span>
-                <span class="badge badge-danger" id="cnt-missing-badge"></span>
-              </div>
-              <div id="cnt-missing-list"></div>
-            </div>
-            <button class="btn-primary" id="btn-cnt-apply">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Confirmar y actualizar stock
-            </button>
-          </div>
-        </div>
-    
-      </section>
-  </div><!-- /main -->
-
-  <!-- Bottom Nav — 6 ítems -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-sec="scan">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M16 16h5M16 19h5M16 22h5"/></svg>
-      Escanear
-    </button>
-    <button class="nav-item" data-sec="deposit">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Depósito
-    </button>
-    <button class="nav-item" data-sec="gondola">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      Góndola
-    </button>
-    <button class="nav-item" data-sec="reception">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M13 16l2 2 4-4"/></svg>
-      Recepción
-    </button>
-    <button class="nav-item" data-sec="conteo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      Conteo
-    </button>
-    <button class="nav-item" data-sec="config">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
-      Más
-    </button>
-  </nav>
-</div>
-
-<!-- Sheet — agregar a lista de reposición -->
-<div id="gondola-sheet-backdrop" class="sheet-backdrop hidden">
-  <div class="sheet">
-    <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
-    <div class="sheet-header">
-      <div class="sheet-header-row">
-        <div class="dep-existing-icon-wrap">
-          <img id="gsh-img" class="dep-product-img hidden" alt=""/>
-          <div class="result-icon" id="gsh-icon"></div>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div class="sheet-title" id="gsh-name"></div>
-          <div class="result-variant" id="gsh-variant" style="margin-top:2px"></div>
-        </div>
-        <button class="sheet-close" id="btn-gsh-close">✕</button>
-      </div>
-      <!-- Stock info -->
-      <div class="gondola-stock-info" id="gsh-stock-info"></div>
     </div>
-    <div class="sheet-body">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:.875rem">¿Cuánto vas a traer a la góndola?</p>
-      <div class="pkg-calc-card" style="margin-bottom:.875rem">
-        <div class="form-row" style="margin-bottom:.5rem">
-          <div class="form-group" style="margin-bottom:0">
-            <label>Cantidad</label>
-            <input type="number" id="gsh-qty" min="1" value="1" inputmode="numeric"/>
-          </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label>Tipo</label>
-            <select id="gsh-qty-type">
-              <option value="pkg">Paquetes</option>
-              <option value="unit">Unidades sueltas</option>
-            </select>
-          </div>
-        </div>
-        <div id="gsh-calc" class="qty-calc-preview"></div>
-      </div>
-      <div class="form-group">
-        <label>Nota (opcional)</label>
-        <input type="text" id="gsh-note" placeholder="Ej: Llevar primero los que vencen antes"/>
-      </div>
-      <button class="btn-primary" id="btn-gsh-add" style="margin-top:.75rem">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Agregar a lista de reposición
+  </section>
+
+  <!-- ══ DEPÓSITO ══════════════════════════════════════════════ -->
+  <section id="pg-dep" class="page">
+    <div class="topbar">
+      <h1>Depósito</h1>
+      <button class="icon-btn" id="btn-dep-cam-toggle" title="Escanear">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M16 16h5M16 19h5M16 22h5"/></svg>
       </button>
     </div>
-  </div>
-</div>
-<!-- Bottom Sheet — detalle producto depósito -->
-<div id="sheet-backdrop" class="sheet-backdrop hidden">
-  <div class="sheet" id="dep-sheet">
-    <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
-    <div class="sheet-header">
-      <div class="sheet-header-row">
-        <div class="dep-existing-icon-wrap">
-          <img id="sh-img" class="dep-product-img hidden" alt=""/>
-          <div class="result-icon" id="sh-icon"></div>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div class="sheet-title" id="sh-name"></div>
-          <div class="result-variant" id="sh-variant" style="margin-top:2px"></div>
-          <div class="result-code" id="sh-code" style="margin-top:2px"></div>
-        </div>
-        <button class="sheet-close" id="btn-sheet-close">✕</button>
+
+    <!-- scanner colapsable -->
+    <div id="dep-cam-wrap" class="hidden cam-section">
+      <div class="viewport sm" id="dep-scan-vp">
+        <video id="dep-scan-video" playsinline muted autoplay></video>
+        <div class="scan-overlay"><div class="scan-frame">
+          <span class="c tl"></span><span class="c tr"></span>
+          <span class="c bl"></span><span class="c br"></span>
+          <div class="scan-line"></div>
+        </div></div>
+        <div class="scan-status" id="dep-scan-status">Presioná iniciar</div>
       </div>
-      <div style="margin-top:.75rem">
-        <span class="badge badge-info" id="sh-cat"></span>
+      <div class="scan-btns">
+        <button class="btn-p" id="btn-dep-cam-start">▶ Iniciar</button>
+        <button class="btn-o hidden" id="btn-dep-cam-stop">Detener</button>
+      </div>
+      <div class="manual-wrap">
+        <div class="manual-row">
+          <input type="text" id="dep-scan-inp" placeholder="Código de barras" inputmode="numeric"/>
+          <button class="btn-p sm" id="btn-dep-scan-manual">OK</button>
+        </div>
       </div>
     </div>
 
-    <div class="sheet-body">
-      <!-- Stock -->
-      <div class="dep-stock-row">
-        <div>
-          <div style="font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Stock actual</div>
-          <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
-            <span style="font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1" id="sh-stock-num">0</span>
-            <span style="font-size:14px;color:var(--text2)">unidades</span>
+    <!-- búsqueda y filtros -->
+    <div class="search-bar sticky">
+      <input type="text" id="dep-search" placeholder="Buscar producto…"/>
+      <select id="dep-cat">
+        <option value="">Todas</option>
+        <option>Bebidas</option><option>Lácteos</option><option>Carnes</option>
+        <option>Frutas y verduras</option><option>Panadería</option><option>Enlatados</option>
+        <option>Higiene personal</option><option>Limpieza</option><option>Congelados</option><option>Otros</option>
+      </select>
+    </div>
+    <div class="chips-bar sticky-chips" id="dep-filter-chips">
+      <button class="chip active" data-f="all">Todos</button>
+      <button class="chip" data-f="zero">Sin stock</button>
+      <button class="chip" data-f="low">Stock bajo</button>
+      <button class="chip" data-f="exp0">Vencidos</button>
+      <button class="chip" data-f="exp7">7 días</button>
+      <button class="chip" data-f="exp15">15 días</button>
+      <button class="chip" data-f="exp30">30 días</button>
+      <button class="chip" data-f="exp60">60 días</button>
+      <button class="chip" data-f="exp90">3 meses</button>
+    </div>
+
+    <div class="scroll" style="padding-top:.5rem">
+      <div class="metrics-row" id="dep-metrics"></div>
+      <div class="card" id="dep-list-card">
+        <div id="dep-list"></div>
+        <div id="dep-empty" class="empty hidden">
+          <p>Sin productos. Usá <strong>Registrar</strong> para dar de alta.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ GÓNDOLA ════════════════════════════════════════════════ -->
+  <section id="pg-gondola" class="page">
+    <div class="topbar">
+      <h1>Góndola</h1>
+      <div style="display:flex;gap:6px">
+        <button class="icon-btn" id="btn-gon-scan" title="Escanear">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M16 16h5M16 19h5M16 22h5"/></svg>
+        </button>
+        <button class="icon-btn hidden" id="btn-gon-share">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button class="icon-btn hidden" id="btn-gon-clear">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="gon-cam-wrap" class="hidden cam-section">
+      <div class="viewport sm" id="gon-scan-vp">
+        <video id="gon-scan-video" playsinline muted autoplay></video>
+        <div class="scan-overlay"><div class="scan-frame">
+          <span class="c tl"></span><span class="c tr"></span>
+          <span class="c bl"></span><span class="c br"></span>
+          <div class="scan-line"></div>
+        </div></div>
+        <div class="scan-status" id="gon-scan-status">Apuntá al código</div>
+      </div>
+      <button class="btn-o full" id="btn-gon-cam-stop" style="margin-top:8px">Cerrar cámara</button>
+    </div>
+
+    <div class="search-bar sticky">
+      <input type="text" id="gon-search" placeholder="Buscar — arroz, tomate, lavandina…"/>
+    </div>
+    <div class="chips-bar sticky-chips" id="gon-cat-chips">
+      <button class="chip active" data-cat="">Todo</button>
+      <button class="chip" data-cat="Bebidas">Bebidas</button>
+      <button class="chip" data-cat="Lácteos">Lácteos</button>
+      <button class="chip" data-cat="Enlatados">Enlatados</button>
+      <button class="chip" data-cat="Panadería">Panadería</button>
+      <button class="chip" data-cat="Higiene personal">Higiene</button>
+      <button class="chip" data-cat="Limpieza">Limpieza</button>
+      <button class="chip" data-cat="Otros">Otros</button>
+    </div>
+
+    <div class="scroll" style="padding-top:.5rem">
+      <div id="gon-welcome" class="card">
+        <p class="hint center">Buscá un producto para ver qué hay en depósito y armar la lista de reposición.</p>
+      </div>
+      <div id="gon-results" class="hidden">
+        <div class="card" id="gon-results-card"></div>
+      </div>
+      <div id="gon-list-section" class="hidden">
+        <div class="section-title-row">
+          <span class="section-mini">Lista de reposición</span>
+          <span class="badge" id="gon-list-badge"></span>
+        </div>
+        <div class="card" id="gon-list-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ REGISTRAR ═════════════════════════════════════════════ -->
+  <section id="pg-reg" class="page">
+    <div class="topbar"><h1>Registrar</h1></div>
+    <div class="scroll">
+
+      <!-- código -->
+      <div class="card mb">
+        <div class="card-body">
+          <label class="lbl">Código de barras *</label>
+          <div class="manual-row">
+            <input type="text" id="reg-barcode" placeholder="Escaneá o ingresá el código" inputmode="numeric"/>
+            <button class="btn-p sm" id="btn-reg-scan">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/></svg>
+            </button>
           </div>
-          <div style="font-size:12px;color:var(--text2);margin-top:2px" id="sh-stock-pkg"></div>
+          <div id="reg-cam-wrap" class="hidden" style="margin-top:.75rem">
+            <div class="viewport sm" id="reg-scan-vp">
+              <video id="reg-scan-video" playsinline muted autoplay></video>
+              <div class="scan-overlay"><div class="scan-frame">
+                <span class="c tl"></span><span class="c tr"></span>
+                <span class="c bl"></span><span class="c br"></span>
+                <div class="scan-line"></div>
+              </div></div>
+              <div class="scan-status" id="reg-scan-status">Apuntá al código</div>
+            </div>
+            <button class="btn-o full" id="btn-reg-cam-stop" style="margin-top:8px">Cerrar cámara</button>
+          </div>
+          <div id="reg-exists-warn" class="warn-box hidden">
+            ⚠️ Este código ya está registrado. Usá <strong>Depósito</strong> para agregar stock.
+          </div>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="dep-tabs" style="grid-template-columns:1fr 1fr 1fr">
-        <button class="dep-tab active" id="sh-tab-in" data-tab="in">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-          Ingresar
-        </button>
-        <button class="dep-tab" id="sh-tab-out" data-tab="out">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-          Retirar
-        </button>
-        <button class="dep-tab" id="sh-tab-edit" data-tab="edit">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Editar
-        </button>
-      </div>
-
-      <!-- Form ingresar -->
-      <div id="sh-form-in" class="card dep-form-card">
+      <!-- datos del producto -->
+      <div class="card mb">
         <div class="card-body">
-          <div class="pkg-calc-card" style="margin-bottom:.75rem">
-            <div class="form-row" style="margin-bottom:.5rem">
-              <div class="form-group" style="margin-bottom:0">
-                <label>Cantidad que ingresa</label>
-                <input type="number" id="sh-in-qty" min="1" value="1" inputmode="numeric"/>
-              </div>
-              <div class="form-group" style="margin-bottom:0">
-                <label>Tipo</label>
-                <select id="sh-in-qty-type">
-                  <option value="pkg">Paquetes (bultos/packs…)</option>
-                  <option value="unit">Unidades sueltas</option>
-                </select>
-              </div>
-            </div>
-            <div id="sh-in-calc" class="qty-calc-preview"></div>
+          <div class="fg">
+            <label class="lbl">Nombre *</label>
+            <input type="text" id="reg-name" placeholder="Ej: Arroz Inca"/>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Fecha vencimiento</label>
-              <input type="date" id="sh-in-exp"/>
-            </div>
-            <div class="form-group">
-              <label>Precio costo ($)</label>
-              <input type="number" id="sh-in-price" step="0.01" placeholder="0.00" inputmode="decimal"/>
-            </div>
+          <div class="fg">
+            <label class="lbl">Variante / tamaño</label>
+            <input type="text" id="reg-variant" placeholder="Ej: 1kg, Light, Sin TACC…"/>
           </div>
-          <div class="form-group">
-            <label>Observaciones</label>
-            <input type="text" id="sh-in-notes" placeholder="Opcional"/>
-          </div>
-          <button class="btn-primary" id="btn-sh-in-confirm">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-            Confirmar ingreso
-          </button>
-        </div>
-      </div>
-
-      <!-- Form retirar -->
-      <div id="sh-form-out" class="card dep-form-card hidden">
-        <div class="card-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cantidad</label>
-              <input type="number" id="sh-out-qty" min="1" value="1" inputmode="numeric"/>
-            </div>
-            <div class="form-group">
-              <label>Tipo</label>
-              <select id="sh-out-pkg-type">
-                <option value="unidad">Unidades</option>
-                <option value="pack">Packs</option>
-                <option value="bulto">Bultos</option>
-                <option value="cajón">Cajones</option>
-                <option value="caja">Cajas</option>
-                <option value="fardo">Fardos</option>
-              </select>
-            </div>
-          </div>
-          <div id="sh-calc-preview" class="dep-calc-preview"></div>
-          <div class="form-group" style="margin-top:.5rem">
-            <label>Motivo</label>
-            <input type="text" id="sh-out-reason" placeholder="Ej: reposición góndola, merma…"/>
-          </div>
-          <button class="btn-primary danger" id="btn-sh-out-confirm" style="margin-top:.25rem">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-            Confirmar retiro
-          </button>
-        </div>
-      </div>
-
-      <!-- Form editar producto -->
-      <div id="sh-form-edit" class="card dep-form-card hidden">
-        <div class="card-body">
-          <!-- Foto -->
-          <div class="form-group">
-            <label>Foto del producto</label>
-            <div class="img-capture-area">
-              <img id="sh-edit-img-preview" class="img-preview hidden" alt=""/>
-              <div id="sh-edit-img-placeholder" class="img-placeholder">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <span>Sin foto</span>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn-outline sm" id="btn-sh-edit-photo" style="flex:1">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                Sacar foto
-              </button>
-              <button class="btn-outline sm" id="btn-sh-edit-clear-photo" disabled style="flex:1">Quitar foto</button>
-            </div>
-            <input type="file" id="sh-edit-inp-photo" accept="image/*" capture="environment" class="hidden"/>
-          </div>
-
-          <div class="form-group">
-            <label>Nombre *</label>
-            <input type="text" id="sh-edit-name" placeholder="Nombre del producto"/>
-          </div>
-          <div class="form-group">
-            <label>Variante / sabor / tamaño</label>
-            <input type="text" id="sh-edit-variant" placeholder="Ej: 1kg, Light, Cola…"/>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Categoría</label>
-              <select id="sh-edit-cat">
+          <div class="row2">
+            <div class="fg">
+              <label class="lbl">Categoría</label>
+              <select id="reg-cat">
                 <option>Bebidas</option><option>Lácteos</option><option>Carnes</option>
-                <option>Frutas y verduras</option><option>Panadería</option>
-                <option>Enlatados</option><option>Otros</option>
-                <option>Higiene personal</option><option>Limpieza</option><option>Congelados</option>
+                <option>Frutas y verduras</option><option>Panadería</option><option>Enlatados</option>
+                <option selected>Otros</option><option>Higiene personal</option>
+                <option>Limpieza</option><option>Congelados</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>Tipo paquete</label>
-              <select id="sh-edit-pkg-type">
-                <option value="unidad">Unidad</option>
+            <div class="fg">
+              <label class="lbl">Tipo de paquete</label>
+              <select id="reg-pkg-type">
+                <option value="unidad">Unidad suelta</option>
                 <option value="pack">Pack</option>
                 <option value="bulto">Bulto</option>
                 <option value="cajón">Cajón</option>
@@ -1117,37 +279,588 @@
               </select>
             </div>
           </div>
-          <div class="form-group">
-            <label>Unidades por paquete</label>
-            <input type="number" id="sh-edit-pkg-qty" min="1" inputmode="numeric" placeholder="Ej: 20"/>
+          <div class="fg" id="reg-pkg-qty-wrap" style="display:none">
+            <label class="lbl">Unidades por paquete</label>
+            <input type="number" id="reg-pkg-qty" min="1" value="12" inputmode="numeric"/>
           </div>
-
-          <button class="btn-primary" id="btn-sh-edit-save" style="margin-top:.25rem">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Guardar cambios
-          </button>
         </div>
       </div>
 
-      <!-- Lotes vigentes -->
-      <div class="card" style="margin-top:.875rem">
-        <div class="card-header">
-          <span class="card-title">Lotes en stock</span>
-          <span class="badge badge-info" id="sh-lots-count"></span>
+      <!-- foto -->
+      <div class="card mb">
+        <div class="card-body">
+          <label class="lbl">Foto del producto (opcional)</label>
+          <div class="img-area" id="reg-img-area">
+            <img id="reg-img-preview" class="hidden" alt=""/>
+            <div id="reg-img-ph">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Sin foto</span>
+            </div>
+          </div>
+          <div class="row2" style="margin-top:8px">
+            <button class="btn-o" id="btn-reg-photo">📷 Sacar foto</button>
+            <button class="btn-o" id="btn-reg-clear-photo" disabled>Quitar</button>
+          </div>
+          <input type="file" id="reg-inp-photo" accept="image/*" capture="environment" class="hidden"/>
         </div>
-        <div id="sh-lots-list"></div>
       </div>
 
-      <!-- Historial retiros -->
-      <div class="card" style="margin-top:.875rem;margin-bottom:.875rem">
-        <div class="card-header"><span class="card-title">Retiros anteriores</span></div>
-        <div id="sh-history-list"></div>
+      <!-- primer ingreso -->
+      <div class="card mb">
+        <div class="card-body">
+          <div class="section-mini" style="margin-bottom:.75rem">Primer ingreso al depósito</div>
+          <div id="reg-qty-calc-wrap" class="calc-box hidden"></div>
+          <div class="row2">
+            <div class="fg">
+              <label class="lbl">Cantidad</label>
+              <input type="number" id="reg-qty" min="1" value="1" inputmode="numeric"/>
+            </div>
+            <div class="fg">
+              <label class="lbl">Tipo entrada</label>
+              <select id="reg-qty-type">
+                <option value="unit">Unidades sueltas</option>
+                <option value="pkg">En paquetes</option>
+              </select>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="fg">
+              <label class="lbl">Fecha vencimiento</label>
+              <input type="date" id="reg-exp"/>
+            </div>
+            <div class="fg">
+              <label class="lbl">Precio costo ($)</label>
+              <input type="number" id="reg-price" step="0.01" placeholder="0.00" inputmode="decimal"/>
+            </div>
+          </div>
+          <button class="btn-p mt" id="btn-reg-save">✓ Registrar producto</button>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ══ RECEPCIÓN ══════════════════════════════════════════════ -->
+  <section id="pg-rec" class="page">
+    <div class="topbar">
+      <h1>Recepción</h1>
+      <button class="icon-btn" id="btn-rec-hist">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+    </div>
+    <div class="scroll">
+      <!-- idle -->
+      <div id="rec-idle">
+        <div class="card mb" style="text-align:center;padding:2rem 1rem">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".3" style="margin-bottom:.875rem"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M13 16l2 2 4-4"/></svg>
+          <p style="font-weight:600;margin-bottom:.5rem">Sin sesión activa</p>
+          <p class="hint">Iniciá una recepción para controlar lo que llega hoy.</p>
+          <button class="btn-p mt" id="btn-rec-new">+ Nueva recepción</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recepciones recientes</span></div>
+          <div id="rec-hist-list"><div class="empty"><p>Sin recepciones aún</p></div></div>
+        </div>
+      </div>
+
+      <!-- nueva sesión form -->
+      <div id="rec-form" class="hidden">
+        <div class="card mb">
+          <div class="card-body">
+            <div class="fg">
+              <label class="lbl">Proveedor *</label>
+              <input type="text" id="rec-supplier" placeholder="Ej: Coca Cola, Arcor…" list="rec-suppliers-list"/>
+              <datalist id="rec-suppliers-list"></datalist>
+            </div>
+            <div class="row2">
+              <div class="fg">
+                <label class="lbl">Fecha</label>
+                <input type="date" id="rec-date"/>
+              </div>
+              <div class="fg">
+                <label class="lbl">Nota</label>
+                <input type="text" id="rec-note" placeholder="Opcional"/>
+              </div>
+            </div>
+            <div class="row2" style="margin-top:.5rem">
+              <button class="btn-p" id="btn-rec-start">Iniciar</button>
+              <button class="btn-o" id="btn-rec-cancel">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- sesión activa -->
+      <div id="rec-active" class="hidden">
+        <div class="session-header">
+          <div>
+            <div class="session-name" id="rec-active-name"></div>
+            <div class="session-meta" id="rec-active-meta"></div>
+          </div>
+          <button class="btn-o sm danger" id="btn-rec-close">Cerrar sesión</button>
+        </div>
+
+        <div class="cam-section">
+          <div class="viewport sm" id="rec-scan-vp">
+            <video id="rec-scan-video" playsinline muted autoplay></video>
+            <div class="scan-overlay"><div class="scan-frame">
+              <span class="c tl"></span><span class="c tr"></span>
+              <span class="c bl"></span><span class="c br"></span>
+              <div class="scan-line"></div>
+            </div></div>
+            <div class="scan-status" id="rec-scan-status">Presioná iniciar</div>
+          </div>
+          <div class="scan-btns">
+            <button class="btn-p" id="btn-rec-cam-start">▶ Iniciar</button>
+            <button class="btn-o hidden" id="btn-rec-cam-stop">Detener</button>
+          </div>
+          <div class="manual-wrap">
+            <div class="manual-row">
+              <input type="text" id="rec-scan-inp" placeholder="Código de barras" inputmode="numeric"/>
+              <button class="btn-p sm" id="btn-rec-scan-manual">OK</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- panel producto escaneado -->
+        <div id="rec-prod-panel" class="hidden card">
+          <div class="card-body">
+            <div class="result-head" style="margin-bottom:.875rem">
+              <div class="avatar" id="rec-p-avatar"></div>
+              <div class="result-info">
+                <div class="result-name" id="rec-p-name"></div>
+                <div class="result-code" id="rec-p-code"></div>
+              </div>
+              <button class="close-btn" id="btn-rec-p-close">✕</button>
+            </div>
+            <div id="rec-p-calc" class="calc-box hidden"></div>
+            <div class="row2">
+              <div class="fg">
+                <label class="lbl">Cantidad recibida</label>
+                <input type="number" id="rec-p-qty" min="1" value="1" inputmode="numeric"/>
+              </div>
+              <div class="fg">
+                <label class="lbl">Tipo</label>
+                <select id="rec-p-qty-type">
+                  <option value="unit">Unidades</option>
+                  <option value="pkg">Paquetes</option>
+                </select>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="fg">
+                <label class="lbl">Vencimiento</label>
+                <input type="date" id="rec-p-exp"/>
+              </div>
+              <div class="fg">
+                <label class="lbl">Precio ($)</label>
+                <input type="number" id="rec-p-price" step="0.01" placeholder="0.00" inputmode="decimal"/>
+              </div>
+            </div>
+            <button class="btn-p mt" id="btn-rec-p-add">+ Agregar a lista</button>
+          </div>
+        </div>
+
+        <div class="section-title-row mt">
+          <span class="section-mini">Lista de la sesión</span>
+          <span class="badge" id="rec-count">0</span>
+        </div>
+        <div class="card">
+          <div id="rec-items-list"><div class="empty"><p>Escaneá un producto</p></div></div>
+        </div>
+        <div id="rec-totals" class="card hidden" style="margin-top:.5rem">
+          <div id="rec-totals-body"></div>
+        </div>
+      </div>
+
+      <!-- sesión cerrada (solo lectura) -->
+      <div id="rec-closed" class="hidden">
+        <div class="session-header">
+          <div>
+            <div class="session-name" id="rec-closed-name"></div>
+            <div class="session-meta" id="rec-closed-meta"></div>
+          </div>
+          <button class="btn-o sm" id="btn-rec-back">← Volver</button>
+        </div>
+        <div class="card mt"><div id="rec-closed-items"></div></div>
+        <div class="card mt" id="rec-closed-totals"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONTEO ═════════════════════════════════════════════════ -->
+  <section id="pg-cnt" class="page">
+    <div class="topbar">
+      <h1>Conteo</h1>
+      <button class="icon-btn" id="btn-cnt-hist">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+    </div>
+    <div class="scroll">
+      <!-- idle -->
+      <div id="cnt-idle">
+        <div class="card mb" style="text-align:center;padding:2rem 1rem">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".3" style="margin-bottom:.875rem"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <p style="font-weight:600;margin-bottom:.5rem">Sin conteo activo</p>
+          <p class="hint">Escaneá todo lo que hay en depósito. El sistema compara y actualiza el stock real.</p>
+          <button class="btn-p mt" id="btn-cnt-new">+ Iniciar conteo</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Conteos anteriores</span></div>
+          <div id="cnt-hist-list"><div class="empty"><p>Sin conteos aún</p></div></div>
+        </div>
+      </div>
+
+      <!-- conteo activo -->
+      <div id="cnt-active" class="hidden">
+        <div class="session-header">
+          <div>
+            <div class="session-name" id="cnt-title"></div>
+            <div class="session-meta" id="cnt-meta"></div>
+          </div>
+          <button class="btn-p sm" id="btn-cnt-finish">Ver diferencias</button>
+        </div>
+
+        <div class="cam-section">
+          <div class="viewport sm" id="cnt-scan-vp">
+            <video id="cnt-scan-video" playsinline muted autoplay></video>
+            <div class="scan-overlay"><div class="scan-frame">
+              <span class="c tl"></span><span class="c tr"></span>
+              <span class="c bl"></span><span class="c br"></span>
+              <div class="scan-line"></div>
+            </div></div>
+            <div class="scan-status" id="cnt-scan-status">Presioná iniciar</div>
+          </div>
+          <div class="scan-btns">
+            <button class="btn-p" id="btn-cnt-cam-start">▶ Iniciar</button>
+            <button class="btn-o hidden" id="btn-cnt-cam-stop">Detener</button>
+          </div>
+          <div class="manual-wrap">
+            <div class="manual-row">
+              <input type="text" id="cnt-scan-inp" placeholder="Código de barras" inputmode="numeric"/>
+              <button class="btn-p sm" id="btn-cnt-scan-manual">OK</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- panel producto conteo -->
+        <div id="cnt-prod-panel" class="hidden card">
+          <div class="card-body">
+            <div class="result-head" style="margin-bottom:.875rem">
+              <div class="avatar" id="cnt-p-avatar"></div>
+              <div class="result-info">
+                <div class="result-name" id="cnt-p-name"></div>
+                <div class="result-code" id="cnt-p-code"></div>
+              </div>
+              <button class="close-btn" id="btn-cnt-p-close">✕</button>
+            </div>
+            <div id="cnt-sys-stock" class="hint" style="margin-bottom:.75rem"></div>
+            <div id="cnt-p-calc" class="calc-box hidden"></div>
+            <div class="row2">
+              <div class="fg">
+                <label class="lbl">Cantidad contada</label>
+                <input type="number" id="cnt-p-qty" min="0" value="0" inputmode="numeric"/>
+              </div>
+              <div class="fg">
+                <label class="lbl">Tipo</label>
+                <select id="cnt-p-qty-type">
+                  <option value="unit">Unidades</option>
+                  <option value="pkg">Paquetes</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-p mt" id="btn-cnt-p-add">+ Agregar al conteo</button>
+          </div>
+        </div>
+
+        <div class="section-title-row mt">
+          <span class="section-mini">Productos contados</span>
+          <span class="badge" id="cnt-count">0</span>
+        </div>
+        <div class="card"><div id="cnt-items-list"><div class="empty"><p>Escaneá el primer producto</p></div></div></div>
+      </div>
+
+      <!-- diferencias -->
+      <div id="cnt-diff" class="hidden">
+        <div class="session-header">
+          <div>
+            <div class="session-name">Diferencias detectadas</div>
+            <div class="session-meta" id="cnt-diff-meta"></div>
+          </div>
+          <button class="btn-o sm" id="btn-cnt-diff-back">← Editar</button>
+        </div>
+        <div class="metrics-row" id="cnt-diff-metrics" style="padding:.875rem .875rem 0"></div>
+        <div class="card mt">
+          <div class="card-header"><span class="card-title">Con diferencia</span><span class="badge" id="cnt-diff-badge"></span></div>
+          <div id="cnt-diff-list"></div>
+        </div>
+        <div class="card mt" id="cnt-missing-card">
+          <div class="card-header"><span class="card-title">No contados → se pondrán en 0</span><span class="badge danger" id="cnt-missing-badge"></span></div>
+          <div id="cnt-missing-list"></div>
+        </div>
+        <button class="btn-p mt" id="btn-cnt-apply">✓ Confirmar y actualizar stock</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MÁS ════════════════════════════════════════════════════ -->
+  <section id="pg-mas" class="page">
+    <div class="topbar"><h1>Más</h1></div>
+    <div class="scroll">
+      <div class="card mb">
+        <div class="card-header"><span class="card-title">Registrar producto nuevo</span></div>
+        <div class="card-body">
+          <p class="hint">Dar de alta un producto que aún no está en el sistema.</p>
+          <button class="btn-o mt" id="btn-go-reg">Ir a Registrar →</button>
+        </div>
+      </div>
+      <div class="card mb">
+        <div class="card-header"><span class="card-title">Copia de seguridad</span></div>
+        <div class="card-body">
+          <p class="hint">Exportá todos tus datos para resguardarlos o migrar a otro dispositivo.</p>
+          <div class="row2 mt">
+            <button class="btn-p sm" id="btn-backup">↓ Exportar backup</button>
+            <button class="btn-o sm" id="btn-restore">↑ Restaurar</button>
+          </div>
+          <input type="file" id="inp-restore" accept=".json" class="hidden"/>
+        </div>
+      </div>
+      <div class="card mb">
+        <div class="card-header"><span class="card-title">Exportar CSV</span></div>
+        <div class="card-body">
+          <p class="hint">Inventario completo para abrir en Excel.</p>
+          <button class="btn-o mt sm" id="btn-csv">↓ Exportar inventario</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ NAV ═════════════════════════════════════════════════ -->
+  <nav id="bottom-nav">
+    <button class="ni active" data-page="scan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M16 16h5M16 19h5M16 22h5"/></svg>
+      Escanear
+    </button>
+    <button class="ni" data-page="dep">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Depósito
+    </button>
+    <button class="ni" data-page="gondola">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Góndola
+    </button>
+    <button class="ni" data-page="rec">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M13 16l2 2 4-4"/></svg>
+      Recepción
+    </button>
+    <button class="ni" data-page="cnt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Conteo
+    </button>
+    <button class="ni" data-page="mas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+      Más
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- Bottom sheet: detalle/editar producto desde depósito -->
+<div id="sheet-bg" class="sheet-bg hidden">
+  <div class="sheet" id="sheet">
+    <div class="sheet-drag"></div>
+    <div class="sheet-hdr">
+      <div class="result-head">
+        <div class="avatar" id="sh-avatar"></div>
+        <div class="result-info">
+          <div class="result-name" id="sh-name"></div>
+          <div class="result-variant" id="sh-variant"></div>
+          <div class="result-code" id="sh-code"></div>
+        </div>
+        <button class="close-btn" id="btn-sh-close">✕</button>
+      </div>
+      <div id="sh-img-wrap" class="prod-img-wrap hidden" style="margin:0 0 .75rem">
+        <img id="sh-img" class="prod-img" alt=""/>
+      </div>
+      <span class="badge" id="sh-cat"></span>
+    </div>
+    <div class="sheet-body">
+      <div class="dep-stock">
+        <div class="stock-label">Stock actual</div>
+        <div class="stock-hero-sm"><span id="sh-stock">0</span> <span class="stock-unit-sm">uds.</span></div>
+        <div class="hint" id="sh-pkg"></div>
+      </div>
+      <div class="tab-row">
+        <button class="tab active" data-tab="in" id="sh-tab-in">↑ Ingresar</button>
+        <button class="tab" data-tab="out" id="sh-tab-out">↓ Retirar</button>
+        <button class="tab" data-tab="edit" id="sh-tab-edit">✏ Editar</button>
+      </div>
+
+      <!-- tab ingresar -->
+      <div id="sh-form-in">
+        <div id="sh-in-calc" class="calc-box hidden" style="margin-bottom:.75rem"></div>
+        <div class="row2">
+          <div class="fg">
+            <label class="lbl">Cantidad</label>
+            <input type="number" id="sh-in-qty" min="1" value="1" inputmode="numeric"/>
+          </div>
+          <div class="fg">
+            <label class="lbl">Tipo</label>
+            <select id="sh-in-qty-type">
+              <option value="unit">Unidades</option>
+              <option value="pkg">Paquetes</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label class="lbl">Vencimiento</label>
+            <input type="date" id="sh-in-exp"/>
+          </div>
+          <div class="fg">
+            <label class="lbl">Precio ($)</label>
+            <input type="number" id="sh-in-price" step="0.01" placeholder="0.00" inputmode="decimal"/>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Observaciones</label>
+          <input type="text" id="sh-in-notes" placeholder="Opcional"/>
+        </div>
+        <button class="btn-p mt" id="btn-sh-in">↑ Confirmar ingreso</button>
+      </div>
+
+      <!-- tab retirar -->
+      <div id="sh-form-out" class="hidden">
+        <div class="row2">
+          <div class="fg">
+            <label class="lbl">Cantidad</label>
+            <input type="number" id="sh-out-qty" min="1" value="1" inputmode="numeric"/>
+          </div>
+          <div class="fg">
+            <label class="lbl">Tipo</label>
+            <select id="sh-out-pkg-type">
+              <option value="unidad">Unidades</option>
+              <option value="pack">Packs</option>
+              <option value="bulto">Bultos</option>
+              <option value="cajón">Cajones</option>
+              <option value="caja">Cajas</option>
+              <option value="fardo">Fardos</option>
+            </select>
+          </div>
+        </div>
+        <div id="sh-out-preview" class="calc-box" style="margin:.5rem 0"></div>
+        <div class="fg">
+          <label class="lbl">Motivo</label>
+          <input type="text" id="sh-out-reason" placeholder="Ej: reposición góndola, merma…"/>
+        </div>
+        <button class="btn-p danger mt" id="btn-sh-out">↓ Confirmar retiro</button>
+      </div>
+
+      <!-- tab editar -->
+      <div id="sh-form-edit" class="hidden">
+        <div class="fg">
+          <label class="lbl">Foto</label>
+          <div class="img-area" id="sh-edit-img-area">
+            <img id="sh-edit-img-preview" class="hidden" alt=""/>
+            <div id="sh-edit-img-ph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Sin foto</span></div>
+          </div>
+          <div class="row2" style="margin-top:8px">
+            <button class="btn-o" id="btn-sh-edit-photo">📷 Foto</button>
+            <button class="btn-o" id="btn-sh-edit-clear" disabled>Quitar</button>
+          </div>
+          <input type="file" id="sh-edit-inp-photo" accept="image/*" capture="environment" class="hidden"/>
+        </div>
+        <div class="fg">
+          <label class="lbl">Nombre *</label>
+          <input type="text" id="sh-edit-name"/>
+        </div>
+        <div class="fg">
+          <label class="lbl">Variante</label>
+          <input type="text" id="sh-edit-variant"/>
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label class="lbl">Categoría</label>
+            <select id="sh-edit-cat">
+              <option>Bebidas</option><option>Lácteos</option><option>Carnes</option>
+              <option>Frutas y verduras</option><option>Panadería</option><option>Enlatados</option>
+              <option>Otros</option><option>Higiene personal</option><option>Limpieza</option><option>Congelados</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="lbl">Tipo paquete</label>
+            <select id="sh-edit-pkg-type">
+              <option value="unidad">Unidad</option>
+              <option value="pack">Pack</option>
+              <option value="bulto">Bulto</option>
+              <option value="cajón">Cajón</option>
+              <option value="caja">Caja</option>
+              <option value="fardo">Fardo</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Uds. por paquete</label>
+          <input type="number" id="sh-edit-pkg-qty" min="1" inputmode="numeric"/>
+        </div>
+        <button class="btn-p mt" id="btn-sh-edit-save">✓ Guardar cambios</button>
+      </div>
+
+      <!-- lotes y retiros -->
+      <div class="section-title-row mt">
+        <span class="section-mini">Lotes en stock</span>
+        <span class="badge" id="sh-lots-count"></span>
+      </div>
+      <div class="card"><div id="sh-lots"></div></div>
+
+      <div class="section-title-row mt">
+        <span class="section-mini">Retiros anteriores</span>
+      </div>
+      <div class="card" style="margin-bottom:1rem"><div id="sh-withdrawals"></div></div>
     </div>
   </div>
 </div>
 
-<div id="toast-container"></div>
+<!-- Bottom sheet: góndola agregar a lista -->
+<div id="gon-sheet-bg" class="sheet-bg hidden">
+  <div class="sheet">
+    <div class="sheet-drag"></div>
+    <div class="sheet-hdr">
+      <div class="result-head">
+        <div class="avatar" id="gsh-avatar"></div>
+        <div class="result-info">
+          <div class="result-name" id="gsh-name"></div>
+          <div class="result-variant" id="gsh-variant"></div>
+        </div>
+        <button class="close-btn" id="btn-gsh-close">✕</button>
+      </div>
+      <div id="gsh-stock-info" class="hint" style="margin-top:.5rem"></div>
+    </div>
+    <div class="sheet-body">
+      <div id="gsh-calc" class="calc-box hidden" style="margin-bottom:.75rem"></div>
+      <div class="row2">
+        <div class="fg">
+          <label class="lbl">Cantidad a traer</label>
+          <input type="number" id="gsh-qty" min="1" value="1" inputmode="numeric"/>
+        </div>
+        <div class="fg">
+          <label class="lbl">Tipo</label>
+          <select id="gsh-qty-type">
+            <option value="unit">Unidades</option>
+            <option value="pkg">Paquetes</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="lbl">Nota (opcional)</label>
+        <input type="text" id="gsh-note" placeholder="Ej: Llevar los que vencen antes"/>
+      </div>
+      <button class="btn-p mt" id="btn-gsh-add">+ Agregar a lista de reposición</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
 <script src="db.js"></script>
 <script src="app.js"></script>
 </body>
