@@ -488,3 +488,16 @@ input::placeholder { color: var(--text3); }
   .sheet-bg .sheet { max-width: 480px; margin: 0 auto; }
   #toast-wrap { max-width: 456px; left: 50%; transform: translateX(-50%); right: auto; }
 }
+
+/* ── img-source-row (cámara / galería / quitar) ──────────── */
+.img-source-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: .75rem;
+}
+.img-source-row .btn-o {
+  font-size: 13px;
+  padding: .45rem .25rem;
+  white-space: nowrap;
+}

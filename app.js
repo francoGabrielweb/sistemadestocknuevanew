@@ -662,13 +662,17 @@ function initSheet() {
   });
 
   // Edit photo
-  $('btn-sh-edit-photo').addEventListener('click', () => $('sh-edit-inp-photo').click());
-  $('sh-edit-inp-photo').addEventListener('change', async e => {
+  async function handleEditPhoto(e) {
     const f=e.target.files[0]; if(!f) return;
     const b64=await compressImg(f);
     $('sh-edit-img-preview').src=b64; $('sh-edit-img-preview').classList.remove('hidden');
     $('sh-edit-img-ph').classList.add('hidden'); $('btn-sh-edit-clear').disabled=false;
-  });
+    e.target.value='';
+  }
+  $('btn-sh-edit-photo-cam').addEventListener('click', () => $('sh-edit-inp-photo-cam').click());
+  $('btn-sh-edit-photo-gal').addEventListener('click', () => $('sh-edit-inp-photo-gal').click());
+  $('sh-edit-inp-photo-cam').addEventListener('change', handleEditPhoto);
+  $('sh-edit-inp-photo-gal').addEventListener('change', handleEditPhoto);
   $('btn-sh-edit-clear').addEventListener('click', () => {
     $('sh-edit-img-preview').src=''; $('sh-edit-img-preview').classList.add('hidden');
     $('sh-edit-img-ph').classList.remove('hidden'); $('btn-sh-edit-clear').disabled=true;
@@ -738,13 +742,17 @@ function initReg() {
   });
 
   // photo
-  $('btn-reg-photo').addEventListener('click', () => $('reg-inp-photo').click());
-  $('reg-inp-photo').addEventListener('change', async e => {
+  $('btn-reg-photo-cam').addEventListener('click', () => $('reg-inp-photo-cam').click());
+  $('btn-reg-photo-gal').addEventListener('click', () => $('reg-inp-photo-gal').click());
+  async function handleRegPhoto(e) {
     const f=e.target.files[0]; if(!f) return;
     regImg = await compressImg(f);
     $('reg-img-preview').src=regImg; $('reg-img-preview').classList.remove('hidden');
     $('reg-img-ph').classList.add('hidden'); $('btn-reg-clear-photo').disabled=false;
-  });
+    e.target.value='';
+  }
+  $('reg-inp-photo-cam').addEventListener('change', handleRegPhoto);
+  $('reg-inp-photo-gal').addEventListener('change', handleRegPhoto);
   $('btn-reg-clear-photo').addEventListener('click', () => {
     regImg=null; $('reg-img-preview').src=''; $('reg-img-preview').classList.add('hidden');
     $('reg-img-ph').classList.remove('hidden'); $('btn-reg-clear-photo').disabled=true;
